@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +33,15 @@ public class PatientServiceImp implements PatientService{
 	@Autowired
 	DoctorRepo doctorRepo;
 	
+    private static final Logger logger = LoggerFactory.getLogger(PatientServiceImp.class);
+
+	
 	@Override
 	public PatientDto getPatient(String patientName) {
-		Patient p = patientRepo.findByFullname(patientName);
-		PatientDto pDto = PatientDto.builder()
+		
+		try {
+		Patient p = Optional.ofNullable(patientRepo.findByFullname(patientName)).orElseThrow(()-> new RuntimeException("Patient not present ... !!"));
+		return PatientDto.builder()
 				.address(p.getAddress())
 				.dob(p.getDob())
 				.email(p.getEmail())
@@ -43,7 +50,12 @@ public class PatientServiceImp implements PatientService{
 				.fullname(p.getFullname())
 				.phoneNo(p.getPhoneNo())
 				.gender(p.getGender()).build();
-		return pDto;
+		
+		}
+		catch(RuntimeException e) {
+			logger.info(e.getMessage());
+			return null;
+		}
 	}
 
 	@Override

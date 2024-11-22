@@ -1,6 +1,11 @@
 package com.interrait.HealthCare.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +19,8 @@ import com.interrait.HealthCare.Dto.DoctorDto;
 import com.interrait.HealthCare.Dto.PatientDto;
 import com.interrait.HealthCare.Entity.Appointment;
 import com.interrait.HealthCare.Entity.Doctor;
+import com.interrait.HealthCare.Entity.Patient;
+import com.interrait.HealthCare.Service.AppointmentService;
 import com.interrait.HealthCare.Service.DoctorService;
 import com.interrait.HealthCare.Service.PatientService;
 
@@ -30,10 +37,21 @@ public class AdminController {
 	@Autowired
 	DoctorService doctorService;
 	
+	@Autowired
+	AppointmentService appointmentService;
+	
 	@GetMapping("/getByFullname")
-	public PatientDto getPatientByFullname(@RequestParam String fullname) {
+	public ResponseEntity<?> getPatientByFullname(@RequestParam String fullname) {
+		PatientDto patient = patientService.getPatient(fullname);
+		if (patient == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(Map.of(
+	                    "message", "Patient is not present. Please create the patient first",
+	                    "status", HttpStatus.NOT_FOUND.value()
+	                ));
+	    }
 		
-		return patientService.getPatient(fullname);
+		return ResponseEntity.ok(patient);
 	}
 	
 	@PostMapping("/registerPatient")
@@ -49,6 +67,11 @@ public class AdminController {
 	@PostMapping("/setAppointment")
 	public Appointment setAppointment(@RequestBody AppointmentDto appointment) {
 		return patientService.setAppointment(appointment);
+	}
+	
+	@GetMapping("/getAllAppoointment")
+	public List<Appointment> getAllAppointment(){
+		return appointmentService.getAllAppointment();
 	}
 	
 	@GetMapping("/test")

@@ -8,7 +8,31 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update 
-      
+  
+
+log4j:
+  rootLogger:
+    level: DEBUG
+    appenders:
+      - stdout
+      - file
+
+  appenders:
+    stdout:
+      type: ConsoleAppender
+      target: System.out
+      layout:
+        type: PatternLayout
+        conversionPattern: "%d{MM-dd-yyyy HH:mm:ss} %-5p %c{1}:%L - %m%n"
+        
+    file:
+      type: FileAppender
+      file: src/main/java/org/interrait/HealthCare/Logs/info.log
+      append: true
+      layout:
+        type: PatternLayout
+        conversionPattern: "%d{MM-dd-yyyy HH:mm:ss} %-5p %c{1}:%L - %m%n"
+
  
 server:
   port: 9091
